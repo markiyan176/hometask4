@@ -3,7 +3,7 @@
 apt update -y
 
 useradd -m -s /bin/bash adminuser
-echo "adminuser:123" | chpasswd
+echo "adminuser:1111" | chpasswd
 usermod -aG sudo adminuser
 
 useradd -m -s /bin/bash poweruser
