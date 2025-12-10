@@ -2,8 +2,13 @@
 
 apt update -y
 
+ADMIN_PASS=$(openssl rand -base64 12)
+echo "Password: $ADMIN_PASS"
+
+ADMIN_HASH=$(openssl passwd -6 "$ADMIN_PASS")
+
 useradd -m -s /bin/bash adminuser
-echo "adminuser:1111" | chpasswd
+echo "adminuser:${ADMIN_HASH}" | chpasswd -e
 usermod -aG sudo adminuser
 
 useradd -m -s /bin/bash poweruser
