@@ -2,14 +2,16 @@
 
 apt update -y
 
-ADMIN_PASS=$(openssl rand -base64 12)
-echo "Password: $ADMIN_PASS"
+PASSWORD=$(openssl rand -base64 12)
 
-ADMIN_HASH=$(openssl passwd -6 "$ADMIN_PASS")
+HASH=$(openssl passwd -6 "$PASSWORD")
 
 useradd -m -s /bin/bash adminuser
-echo "adminuser:${ADMIN_HASH}" | chpasswd -e
+usermod -p "$HASH" adminuser
 usermod -aG sudo adminuser
+
+echo "adminuser password: $PASSWORD" > /root/adminuser_password.txt
+chmod 600 /root/adminuser_password.txt
 
 useradd -m -s /bin/bash poweruser
 passwd -d poweruser
@@ -17,14 +19,10 @@ passwd -d poweruser
 echo "poweruser ALL=(ALL) NOPASSWD: /usr/sbin/iptables" > /etc/sudoers.d/poweruser
 chmod 440 /etc/sudoers.d/poweruser
 
-sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/^#*KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/^PermitEmptyPasswords.*/PermitEmptyPasswords no/' /etc/ssh/sshd_config
-
-systemctl restart sshd
+usermod -aG adminuser poweruser
 
 chmod 750 /home/adminuser
-chgrp poweruser /home/adminuser
 
 ln -s /etc/mtab /home/poweruser/mtab-link
 
+systemctl restart sshd
