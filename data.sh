@@ -2,9 +2,8 @@
 
 apt update -y
 
-PASSWORD=$(openssl rand -base64 12)
+PASSWORD=$(openssl rand -base64 12); HASH=$(openssl passwd -6 "$PASSWORD")
 
-HASH=$(openssl passwd -6 "$PASSWORD")
 
 useradd -m -s /bin/bash adminuser
 usermod -p "$HASH" adminuser
@@ -24,5 +23,3 @@ usermod -aG adminuser poweruser
 chmod 750 /home/adminuser
 
 ln -s /etc/mtab /home/poweruser/mtab-link
-
-systemctl restart sshd
